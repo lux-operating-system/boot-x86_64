@@ -23,20 +23,63 @@ jmp 0x0000:main
 main:
     mov ss, ax
     mov sp, 0x7C00  ; the stack grows downwards
+
+    mov [boot_disk], dl
     sti
 
-    mov si, hello
-    call print
+    ; check for a valid partition
+    mov si, partitions
+    mov cx, 4
 
-    cli
-    hlt
+    .loop:
+        mov al, [si]
+        test al, 0x80   ; bootable bit
+        jnz .boot
 
-; print: prints a string
+        add si, 16
+        dec cx
+        jnz .loop
+
+        mov si, no_active
+        jmp print
+    
+    .boot:
+        ; load the sector specified by the partition
+        push si             ; preserve the partition
+        mov di, dap
+        mov eax, [si+8]     ; sector number
+        mov dx, [si+12]
+        mov [di+8], eax
+        mov [di+12], dx
+
+        ; reset the drive
+        clc
+        xor ax, ax
+        mov dl, [boot_disk]
+        int 0x13
+        jc .disk_error
+
+        ; read sectors
+        mov ah, 0x42
+        mov si, dap
+        mov dl, [boot_disk]
+        int 0x13
+        jc .disk_error
+
+        ; done
+        pop si
+        mov dl, [boot_disk]
+        jmp 0x0000:0x7C00
+    
+    .disk_error:
+        mov si, disk_error
+        jmp print
+
+; print: prints a string and halts
 ; Parameters: ds:si = pointer to null-terminated string
 ; Returns: nothing
 
 print:
-    pushf
     cld
 
     .loop:
@@ -49,11 +92,32 @@ print:
         jmp short .loop
 
     .end:
-        popf
-        ret
+        sti
+        hlt
+        jmp .end
+
+; disk address packet
+align 4
+dap:
+    .size           db 0x10
+    .reserved       db 0
+    .count          dw 1
+    .offset         dw 0x7C00
+    .segment        dw 0x0000
+    .lba            dq 0
+
+boot_disk:          db 0
 
 ; strings
-hello:              db "hello world!", 0
+no_active:          db "no active partition found", 0
+disk_error:         db "disk i/o error", 0
 
-times 510 - ($-$$) db 0
+times 446 - ($-$$)  db 0
+
+; partition table, this will be overwritten by the partition software
+partitions:
+
+    times 64 db 0
+
+times 510 - ($-$$)  db 0
 boot_signature:     dw 0xAA55
