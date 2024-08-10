@@ -48,9 +48,7 @@ main:
         push si             ; preserve the partition
         mov di, dap
         mov eax, [si+8]     ; sector number
-        mov dx, [si+12]
-        mov [di+8], eax
-        mov [di+12], dx
+        mov [dap.lba], eax
 
         ; reset the drive
         clc
@@ -69,6 +67,7 @@ main:
         ; done
         pop si
         mov dl, [boot_disk]
+
         jmp 0x0000:0x7C00
     
     .disk_error:
