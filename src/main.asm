@@ -68,6 +68,7 @@ print:
         ret
 
 %include "src/mode.asm"
+%include "src/bios.asm"
 
 life:                       db "lux boot program", 13, 10, 0
 
@@ -82,6 +83,10 @@ partition:
     .chs_end:       times 3 db 0
     .start:         dd 0
     .size:          dd 0
+
+                    dd video_api        ; this will allow BIOS calls
+                    dd 0    ; disk_api
+                    dd 0    ; keyboard_api
 
 times 0x300 - ($-$$) db 0                   ; pad out to 0x800
 pmode_program:      incbin "lxboot.core"

@@ -15,10 +15,6 @@ bootsec.bin: src/bootsect/bootsec.asm
 	@echo "\x1B[0;1;32m [  AS   ]\x1B[0m src/bootsect/bootsec.asm"
 	@nasm -f bin src/bootsect/bootsec.asm -o bootsec.bin
 
-lxboot.bin: src/*.asm lxboot.core
-	@echo "\x1B[0;1;32m [  AS   ]\x1B[0m src/main.asm"
-	@nasm -f bin src/main.asm -o lxboot.bin
-
 %.o: %.c
 	@echo "\x1B[0;1;32m [  CC   ]\x1B[0m $<"
 	@$(CC) $(CCFLAGS) -o $@ $<
@@ -28,6 +24,10 @@ lxboot.core: $(OBJ) src/core/stub.asm
 	@nasm -f elf src/core/stub.asm -o src/core/stub.o
 	@echo "\x1B[0;1;34m [  LD   ]\x1B[0m lxboot.core"
 	@$(LD) $(LDFLAGS) src/core/stub.o $(OBJ) -o lxboot.core
+
+lxboot.bin: src/*.asm lxboot.core
+	@echo "\x1B[0;1;32m [  AS   ]\x1B[0m src/main.asm"
+	@nasm -f bin src/main.asm -o lxboot.bin
 
 clean:
 	@rm -f mbr.bin bootsec.bin lxboot.bin $(OBJ)

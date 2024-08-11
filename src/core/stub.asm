@@ -11,6 +11,9 @@ section .stub
 global _start
 _start:
     extern main
+
+    cld
+    push esi
     call main
 
     cli
