@@ -75,10 +75,10 @@ main:
     mov ax, 32              ; size of boot blocks
     mul cx                  ; blocks -> sectors
 
-    cmp cx, 64             ; segmentation limit
+    cmp cx, 127             ; segmentation limit
     jl .setup
 
-    mov cx, 64
+    mov cx, 127
 
 .setup:
     mov [dap.count], cx
