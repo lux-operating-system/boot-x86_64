@@ -85,7 +85,7 @@ partition:
     .size:          dd 0
 
                     dd video_api        ; this will allow BIOS calls
-                    dd 0    ; disk_api
+                    dd disk_api
                     dd 0    ; keyboard_api
 
 times 0x300 - ($-$$) db 0                   ; pad out to 0x800
