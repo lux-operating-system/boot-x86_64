@@ -73,6 +73,7 @@ int vprintf(const char *f, va_list args) {
     int formatIndex, number;
     int numberLength, paddingLength;
     char paddingCharacter;
+    char *str;
 
     while(*f) {
         if(!formatter && *f == '%') {
@@ -108,6 +109,11 @@ int vprintf(const char *f, va_list args) {
                     case 'c':
                         number = va_arg(args, int);
                         putchar(number);
+                        break;
+                    case 's':
+                        str = va_arg(args, char *);
+                        print(str);
+                        l += strlen(str);
                         break;
                     case 'd':
                     case 'i':
