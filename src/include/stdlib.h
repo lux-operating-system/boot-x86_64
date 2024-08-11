@@ -12,3 +12,4 @@
 #define HEX         16
 
 char *itoa(int, char *, int);
+int atoi(const char *);

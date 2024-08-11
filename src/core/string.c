@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /* partial implementation of the standard C library for convenience */
 /* really to help with debugging and to make this a little less obnoxious */
@@ -51,7 +52,7 @@ char *itoa(int n, char *buffer, int radix) {
         int digit = n % radix;
 
         if(digit >= 10) {
-            buffer[length] = 'a' + digit;
+            buffer[length] = 'a' + digit - 10;
         } else {
             buffer[length] = '0' + digit;
         }
@@ -72,4 +73,38 @@ char *itoa(int n, char *buffer, int radix) {
     }
 
     return buffer;
+}
+
+int atoi(const char *s) {
+    int v = 0;
+    int len = 0;
+
+    while(s[len] >= '0' && s[len] <= '9') {
+        len++;      // didn't use strlen so we can only account for numerical characters
+    }
+
+    if(!len) return 0;
+
+    char buffer[20];
+
+    int multiplier = 1;
+    for(int i = 1; i < len; i++) {
+        multiplier *= 10;
+    }
+
+    for(int i = 0; i < len; i++) {
+        int digit = s[i] - '0';
+        v += (digit * multiplier);
+        multiplier /= 10;
+    }
+
+    return v;
+}
+
+void *memset(void *dst, int v, size_t n) {
+    uint8_t *dstc = (uint8_t *)dst;
+    for(size_t i = 0; i < n; i++) {
+        dstc[i] = v;
+    }
+    return dst;
 }
