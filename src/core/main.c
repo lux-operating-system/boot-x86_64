@@ -7,13 +7,17 @@
 
 #include <lxboot.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 LXBootInfo bootInfo;
+CPURegisters *biosRegs;
 
 int main(LXBootInfo *boot) {
     memcpy(&bootInfo, boot, sizeof(LXBootInfo));
+    biosRegs = (CPURegisters *)boot->regs;
 
-    print("hello world from a C program!");
+    print("hello world from a C program!\n");
 
     return 0;
 }

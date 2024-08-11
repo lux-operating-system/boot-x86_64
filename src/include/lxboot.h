@@ -21,6 +21,7 @@ typedef struct {
     uint32_t videoAPI;      /* callable routines for BIOS API functions */
     uint32_t diskAPI;
     uint32_t keyboardAPI;
+    uint32_t regs;
 } __attribute__((packed)) LXBootInfo;
 
 /* this structure is used to pass info to and from the BIOS */
@@ -35,4 +36,4 @@ typedef struct {
 } __attribute__((packed)) CPURegisters;
 
 extern LXBootInfo bootInfo;
-void print(const char *);
+extern CPURegisters *biosRegs;

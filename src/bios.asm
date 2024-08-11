@@ -7,12 +7,9 @@
 
 [bits 32]
 
-; void video_api(CPURegisters *r)
+; void video_api()
 
 video_api:
-    mov eax, [esp+4]
-    mov [.regs], eax
-
     pusha
     mov [.stack], esp
     mov [.frame], ebp
@@ -21,7 +18,7 @@ video_api:
 
 [bits 16]
 
-    mov esi, [.regs]
+    mov esi, registers
     mov eax, [esi]
     mov ebx, [esi+4]
     mov ecx, [esi+8]
@@ -31,7 +28,7 @@ video_api:
 
     int 0x10
 
-    mov ebp, [.regs]
+    mov ebp, registers
     mov [ebp], eax
     mov [ebp+4], ebx
     mov [ebp+8], ecx
@@ -53,14 +50,10 @@ video_api:
 
 .stack:             dd 0
 .frame:             dd 0
-.regs:              dd 0
 
-; void disk_api(CPURegisters *r)
+; void disk_api()
 
 disk_api:
-    mov eax, [esp+4]
-    mov [.regs], eax
-
     pusha
     mov [.stack], esp
     mov [.frame], ebp
@@ -69,7 +62,7 @@ disk_api:
 
 [bits 16]
 
-    mov esi, [.regs]
+    mov esi, registers
     mov eax, [esi]
     mov ebx, [esi+4]
     mov ecx, [esi+8]
@@ -79,7 +72,7 @@ disk_api:
 
     int 0x13
 
-    mov ebp, [.regs]
+    mov ebp, registers
     mov [ebp], eax
     mov [ebp+4], ebx
     mov [ebp+8], ecx
@@ -101,4 +94,13 @@ disk_api:
 
 .stack:             dd 0
 .frame:             dd 0
-.regs:              dd 0
+
+align 4
+registers:
+    .eax            dd 0
+    .ebx            dd 0
+    .ecx            dd 0
+    .edx            dd 0
+    .esi            dd 0
+    .edi            dd 0
+    .eflags         dd 0

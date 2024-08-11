@@ -14,7 +14,9 @@ _start:
 
     cld
     push esi
-    call main
+    mov eax, main
+    mov ebp, esp
+    call eax
 
     cli
     hlt

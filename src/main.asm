@@ -33,9 +33,9 @@ main:
     rep movsw           ; partition
 
     mov ds, ax
-    mov ax, 0x7E0
+    mov ax, 0
     mov ss, ax
-    xor sp, sp          ; setup a large stack at 0x07E0:0xFFFF
+    mov sp, 0x500
 
     sti
 
@@ -87,6 +87,8 @@ partition:
                     dd video_api        ; this will allow BIOS calls
                     dd disk_api
                     dd 0    ; keyboard_api
+
+                    dd registers
 
 times 0x300 - ($-$$) db 0                   ; pad out to 0x800
 pmode_program:      incbin "lxboot.core"

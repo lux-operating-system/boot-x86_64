@@ -69,9 +69,8 @@ rmode:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov ax, 0x7E0
     mov ss, ax
-    xor sp, sp
+    mov sp, 0x500
 
     sti
 
