@@ -55,13 +55,80 @@ main:
 
     sti
 
-    mov ah, 0x0E
-    mov al, 'y'
-    int 0x10
+    ; reset the drive
+    clc
+    xor ah, ah
+    int 0x13
+    jc .drive_error
 
-    cli
-    hlt
+    ; load the boot program as specified by its size
+    mov cl, [lxfs_id.flags]
+    shr cl, 3
+    and cl, 0x0F
+    inc cl
+    movzx ecx, cl           ; ecx = sectors per block
 
+    mov eax, [partition.start]
+    add eax, ecx
+    mov [dap.lba], eax      ; start of the first block in sectors
+
+    mov ax, 32              ; size of boot blocks
+    mul cx                  ; blocks -> sectors
+
+    cmp cx, 127             ; segmentation limit
+    jl .setup
+
+    mov cx, 127
+
+.setup:
+    mov [dap.count], cx
+
+    ; and read the sectors
+    clc
+    mov ah, 0x42
+    mov dl, [boot_disk]
+    mov si, dap
+    int 0x13
+    jc .drive_error
+
+    ; ensure validity of the program
+    push ds
+    mov ax, [dap.segment]
+    mov ds, ax
+    mov si, [dap.offset]
+    mov eax, [si]
+    pop ds
+    cmp eax, 0x5346584C     ; magic number
+    jnz .boot_error
+
+    ; now run the boot program
+    mov si, partition
+    mov dl, [boot_disk]
+    jmp 0x0000:0x0500
+
+    .drive_error:
+        mov si, drive_error
+        jmp print
+
+    .boot_error:
+        mov si, boot_error
+
+print:
+    cld
+
+    .loop:
+        lodsb
+        and al, al
+        jz .end
+
+        mov ah, 0x0E
+        int 0x10
+        jmp short .loop
+    
+    .end:
+        sti
+        hlt
+        jmp .end
 
 ; MBR partition entry
 partition:
@@ -73,6 +140,19 @@ partition:
     .size:          dd 0
 
 boot_disk:          db 0
+
+; disk address packet
+align 4
+dap:
+    .size           db 0x10
+    .reserved       db 0
+    .count          dw 0
+    .offset         dw 0x0000
+    .segment        dw 0x0050
+    .lba            dq 0
+
+drive_error:        db "disk i/o error", 0
+boot_error:         db "boot program invalid", 0
 
 times 510 - ($-$$)  db 0
 boot_signature:     dw 0xAA55
