@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <stddef.h>
+#define OCTAL       8
+#define DECIMAL     10
+#define HEX         16
 
-void *memcpy(void *, const void *, size_t);
-size_t strlen(const char *);
-char *strcpy(char *, const char *);
+char *itoa(int, char *, int);
