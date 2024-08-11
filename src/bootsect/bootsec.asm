@@ -75,10 +75,10 @@ main:
     mov ax, 32              ; size of boot blocks
     mul cx                  ; blocks -> sectors
 
-    cmp cx, 127             ; segmentation limit
+    cmp cx, 64             ; segmentation limit
     jl .setup
 
-    mov cx, 127
+    mov cx, 64
 
 .setup:
     mov [dap.count], cx
@@ -93,9 +93,9 @@ main:
 
     ; ensure validity of the program
     push ds
-    mov ax, [dap.segment]
+    mov ax, 0x50
     mov ds, ax
-    mov si, [dap.offset]
+    xor si, si
     mov eax, [si]
     pop ds
     cmp eax, 0x5346584C     ; magic number
