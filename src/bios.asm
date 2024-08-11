@@ -70,6 +70,7 @@ disk_api:
     mov edi, [esi+20]
     mov esi, [esi+16]
 
+    clc     ; some BIOSes don't explicitly clear on success
     int 0x13
 
     mov ebp, registers
