@@ -35,5 +35,17 @@ typedef struct {
     uint32_t eflags;
 } __attribute__((packed)) CPURegisters;
 
+/* for BIOS INT 13h */
+typedef struct {
+    uint8_t size;
+    uint8_t reserved;
+    uint16_t count;
+    uint16_t offset;
+    uint16_t segment;
+    uint64_t lba;
+} __attribute__((packed)) DiskAddressPacket;
+
 extern LXBootInfo bootInfo;
 extern CPURegisters *biosRegs;
+
+int readSectors(void *, uint32_t, int);
