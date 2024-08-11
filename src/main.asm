@@ -43,6 +43,39 @@ main:
     mov si, life
     call print
 
+    ; enable a20 gate
+    clc
+    mov ax, 0x2402          ; query
+    int 0x15
+    jc .fast_a20
+
+    and ah, ah
+    jnz .fast_a20
+
+    cmp al, 1               ; already enabled
+    jz .a20_done
+
+    ; not yet enabled, enable it now
+    clc
+    mov ax, 0x2401
+    int 0x15
+    jc .fast_a20
+
+    and ah, ah
+    jz .a20_done
+
+.fast_a20:
+    ; this is an alternative if the BIOS functions above don't work
+    mov dx, 0x92
+    in al, dx
+    test al, 2
+    jnz .a20_done       ; already enabled
+
+    or al, 2
+    out dx, al
+    nop                 ; delay the CPU for a cycle
+
+.a20_done:
     ; jump to the protected mode entry point
     call pmode
 
