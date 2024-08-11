@@ -43,8 +43,15 @@ main:
     mov si, life
     call print
 
-    cli
-    hlt
+    ; jump to the protected mode entry point
+    call pmode
+
+[bits 32]
+
+    mov esi, boot_info
+    jmp pmode_program
+
+[bits 16]
 
 print:
     cld
@@ -75,3 +82,6 @@ partition:
     .chs_end:       times 3 db 0
     .start:         dd 0
     .size:          dd 0
+
+times 0x300 - ($-$$) db 0                   ; pad out to 0x800
+pmode_program:      incbin "lxboot.core"
