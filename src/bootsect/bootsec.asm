@@ -75,13 +75,13 @@ main:
     mov ax, 32              ; size of boot blocks
     mul cx                  ; blocks -> sectors
 
-    cmp cx, 127             ; segmentation limit
+    cmp ax, 127             ; segmentation limit
     jl .setup
 
-    mov cx, 127
+    mov ax, 127
 
 .setup:
-    mov [dap.count], cx
+    mov [dap.count], ax
 
     ; and read the sectors
     clc
