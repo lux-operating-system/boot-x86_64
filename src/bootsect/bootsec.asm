@@ -104,7 +104,7 @@ main:
     ; now run the boot program
     mov si, partition
     mov dl, [boot_disk]
-    jmp 0x0000:0x0500
+    jmp 0x0000:0x0540
 
     .drive_error:
         mov si, drive_error
