@@ -119,3 +119,16 @@ int strcmp(const char *s1, const char *s2) {
 
     return *s1 - *s2;
 }
+
+int memcmp(const void *d1, const void *d2, size_t n) {
+    uint8_t *d1c = (uint8_t *)d1;
+    uint8_t *d2c = (uint8_t *)d2;
+
+    for(size_t i = 0; i < n; i++) {
+        if(*d1c != *d2c) {
+            return *d1c - *d2c;
+        }
+    }
+
+    return 0;
+}
