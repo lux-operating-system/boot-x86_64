@@ -30,7 +30,7 @@ unsigned int getSectorSize(uint8_t disk, int partition) {
     return (512 << shift);
 }
 
-uint32_t getRootDirectory(uint8_t disk, int partition) {
+uint64_t getRootDirectory(uint8_t disk, int partition) {
     uint32_t partitionStart = getPartitionStart(disk, partition);
     readSectors((void *)LXFS_BLOCK_BUFFER, partitionStart, 1, disk);
     LXFSIdentification *id = (LXFSIdentification *)LXFS_BLOCK_BUFFER;
@@ -38,14 +38,14 @@ uint32_t getRootDirectory(uint8_t disk, int partition) {
     return id->rootBlock;
 }
 
-size_t readBlock(uint8_t disk, int partition, uint32_t start, size_t count, void *buffer) {
+size_t readBlock(uint8_t disk, int partition, uint64_t start, size_t count, void *buffer) {
     uint32_t partitionStart = getPartitionStart(disk, partition);
     uint32_t blockSize = getBlockSize(disk, partition);
     readSectors(buffer, (start*blockSize)+partitionStart, count*blockSize, disk);
     return count;
 }
 
-uint32_t getNextBlock(uint8_t disk, int partition, uint32_t block) {
+uint64_t getNextBlock(uint8_t disk, int partition, uint32_t block) {
     int blockSizeBytes = getBlockSize(disk, partition) * getSectorSize(disk, partition);
     uint32_t tableBlock = block / (blockSizeBytes / 8);
     tableBlock += 33;       // skip to the actual table blocks
@@ -57,7 +57,7 @@ uint32_t getNextBlock(uint8_t disk, int partition, uint32_t block) {
     return data[tableIndex];
 }
 
-uint32_t readNextBlock(uint8_t disk, int partition, uint32_t block, void *buffer) {
+uint64_t readNextBlock(uint8_t disk, int partition, uint64_t block, void *buffer) {
     readBlock(disk, partition, block, 1, buffer);
     return getNextBlock(disk, partition, block);
 }

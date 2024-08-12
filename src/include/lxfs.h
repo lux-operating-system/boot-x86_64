@@ -110,11 +110,12 @@ typedef struct {
 #define LXFS_TEXT_BUFFER            0x58000
 #define LXFS_DIRECTORY_BUFFER       0x60000
 
-size_t readBlock(uint8_t, int, uint32_t, size_t, void *);
-uint32_t getNextBlock(uint8_t, int, uint32_t);
-uint32_t readNextBlock(uint8_t, int, uint32_t, void *);
-uint32_t getRootDirectory(uint8_t, int);
+size_t readBlock(uint8_t, int, uint64_t, size_t, void *);
+uint64_t getNextBlock(uint8_t, int, uint32_t);
+uint64_t readNextBlock(uint8_t, int, uint64_t, void *);
+uint64_t getRootDirectory(uint8_t, int);
 unsigned int getBlockSize(uint8_t, int);
 unsigned int getSectorSize(uint8_t, int);
 
 bool lxfsFindPath(uint8_t, int, const char *, LXFSDirectoryEntry *);
+bool lxfsRead(uint8_t, int, const char *, void *);
