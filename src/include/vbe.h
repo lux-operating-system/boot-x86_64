@@ -114,3 +114,5 @@ typedef struct {
     uint8_t reserved;
     uint8_t checksum;
 } __attribute__((packed)) VBEMonitor;
+
+int vbeSetup();
