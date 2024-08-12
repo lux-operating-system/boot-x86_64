@@ -17,9 +17,7 @@ int main(LXBootInfo *boot) {
     memcpy(&bootInfo, boot, sizeof(LXBootInfo));
     biosRegs = (CPURegisters *)boot->regs;
 
-    printf("hello world from a C program!\n");
-    printf("testing printf: %d 0x%08X\n", 12345, 0xABCDEF);
-    printf("testing atoi: %d\n", atoi("123"));
+    findBootPartition();
 
     return 0;
 }

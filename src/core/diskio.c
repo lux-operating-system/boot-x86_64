@@ -13,6 +13,7 @@
 
 DiskAddressPacket dap;
 CPURegisters regs;
+int partitionIndex;
 
 void diskAPI(CPURegisters *r) {
     void (*d)(CPURegisters *) = (void (*))bootInfo.diskAPI;
@@ -38,11 +39,28 @@ int readSectors(void *dst, uint32_t lba, int count) {
 
         if(biosRegs->eflags & 1) {   /* CF indicates error */
             printf("disk i/o error on sector %d drive 0x%02X\n", lba+i, bootInfo.bootDevice);
-            return i;
+            while(1);   // hang
         }
 
         memcpy(dst + (i * 512), (const void *)DISK_BUFFER, 512);
     }
 
     return count;
+}
+
+int findBootPartition() {
+    // returns the zero-based index of the boot partition within the boot drive
+    readSectors((void *)DISK_BUFFER, 0, 1);
+    MBRPartition *partitions = (MBRPartition *)((uint8_t *)DISK_BUFFER + MBR_PARTITION_OFFSET);
+
+    for(int i = 0; i < 4; i++) {
+        if(partitions[i].start == bootInfo.partition.start) {
+            //printf("found boot partition at index %d\n", i);
+            partitionIndex = i;
+            return i;
+        }
+    }
+
+    printf("cannot find boot partition\n");
+    while(1);
 }

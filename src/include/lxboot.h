@@ -49,3 +49,4 @@ extern LXBootInfo bootInfo;
 extern CPURegisters *biosRegs;
 
 int readSectors(void *, uint32_t, int);
+int findBootPartition();
