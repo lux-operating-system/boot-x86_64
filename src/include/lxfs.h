@@ -89,3 +89,9 @@ typedef struct {
 #define LXFS_DIR_TYPE_DIR           0x01
 #define LXFS_DIR_TYPE_SOFT_LINK     0x02
 #define LXFS_DIR_TYPE_HARD_LINK     0x03
+
+/* implementation-specific constants */
+#define LXFS_BLOCK_BUFFER               0x70000
+#define LXFS_DIRECTORY_BUFFER           0x78000
+
+size_t readBlock(uint8_t, int, uint64_t, size_t, void *);
