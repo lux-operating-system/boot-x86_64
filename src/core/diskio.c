@@ -21,7 +21,7 @@ void diskAPI(CPURegisters *r) {
     d(biosRegs);
 }
 
-int readSectors(void *dst, uint32_t lba, int count) {
+int readSectors(void *dst, uint32_t lba, int count, uint8_t disk) {
     dap.size = sizeof(DiskAddressPacket);
     dap.reserved = 0;
 
@@ -32,7 +32,7 @@ int readSectors(void *dst, uint32_t lba, int count) {
         dap.lba = lba + i;
 
         regs.eax = 0x4200;
-        regs.edx = bootInfo.bootDevice & 0xFF;
+        regs.edx = disk & 0xFF;
         regs.esi = (uint32_t)&dap;
 
         diskAPI(&regs);
@@ -50,7 +50,7 @@ int readSectors(void *dst, uint32_t lba, int count) {
 
 int findBootPartition() {
     // returns the zero-based index of the boot partition within the boot drive
-    readSectors((void *)DISK_BUFFER, 0, 1);
+    readSectors((void *)DISK_BUFFER, 0, 1, bootInfo.bootDevice);
     MBRPartition *partitions = (MBRPartition *)((uint8_t *)DISK_BUFFER + MBR_PARTITION_OFFSET);
 
     for(int i = 0; i < 4; i++) {
