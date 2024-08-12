@@ -13,7 +13,7 @@
 VBEController controller;
 VBEMode mode;
 VBEMonitor monitor;
-uint16_t *modes;
+static uint16_t *modes;
 static CPURegisters regs;
 
 int vbeSetup() {
@@ -27,6 +27,8 @@ int vbeSetup() {
         printf("vbe: failed to query display controller, status 0x%04X\n", biosRegs->eax & 0xFFFF);
         while(1);
     }
+
+    modes = (uint16_t *)((uint32_t)(controller.modeSegment << 4) + controller.modeOffset);
 
     // now attempt to get monitor info
     uint16_t preferredWidth, preferredHeight;
@@ -51,5 +53,52 @@ int vbeSetup() {
         printf("vbe: preferred resolution is %dx%d\n", preferredWidth, preferredHeight);
     }
 
-    return 0;
+    if(vbeSetMode(preferredWidth, preferredHeight, 32)) return 0;
+
+    // here we somehow failed to set preferred resolution, so try again
+    preferredWidth = 1024;
+    preferredHeight = 768;
+    if(vbeSetMode(preferredWidth, preferredHeight, 32)) return 0;
+
+    printf("vbe: failed to set screen resolution\n");
+    while(1);
+}
+
+VBEMode *vbeSetMode(uint16_t w, uint16_t h, uint8_t bpp) {
+    printf("vbe: attempt to set screen resolution %dx%dx%d\n", w, h, bpp);
+
+    for(int i = 0; modes[i] != 0xFFFF; i++) {
+        // query the BIOS for each mode one by one
+        regs.eax = 0x4F01;
+        regs.ecx = modes[i] & 0xFFFF;
+        regs.edi = (uint32_t)&mode;
+        videoAPI(&regs);
+
+        if((biosRegs->eax & 0xFFFF) != 0x004F) {
+            printf("vbe: failed to query mode 0x%04X, status 0x%04X\n", modes[i], regs.eax & 0xFFFF);
+            return NULL;
+        }
+
+        //printf("vbe: mode 0x%04X: %dx%dx%d\n", modes[i], mode.width, mode.height, mode.bpp);
+
+        if(mode.width == w && mode.height == h && mode.bpp == bpp) {
+            // found the mode to use
+            printf("vbe: found mode 0x%04X\n", modes[i]);
+            
+            regs.eax = 0x4F02;
+            regs.ebx = modes[i] & ~(VBE_ENABLE_CRTC);
+            regs.ebx |= VBE_ENABLE_LINEAR_FB;
+            regs.edi = 0;
+            videoAPI(&regs);
+
+            if((biosRegs->eax & 0xFFFF) != 0x004F) {
+                printf("vbe: failed to set mode 0x%04X, status 0x%04X\n", modes[i], regs.eax & 0xFFFF);
+                return NULL;
+            }
+
+            return &mode;
+        }
+    }
+
+    return NULL;
 }
