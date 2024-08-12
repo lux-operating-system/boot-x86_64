@@ -1,4 +1,4 @@
-CCFLAGS=-c -I./src/include -ffreestanding -O2 -m32
+CCFLAGS=-c -I./src/include -ffreestanding -O2 -m32 -mno-sse
 LDFLAGS=-T./src/lxboot.ld -nostdlib -m elf_i386
 CC=x86_64-elf-gcc
 LD=x86_64-elf-ld
