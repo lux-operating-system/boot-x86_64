@@ -29,6 +29,14 @@ unsigned int getSectorSize(uint8_t disk, int partition) {
     return (512 << shift);
 }
 
+uint64_t getRootDirectory(uint8_t disk, int partition) {
+    uint32_t partitionStart = getPartitionStart(disk, partition);
+    readSectors((void *)LXFS_BLOCK_BUFFER, partitionStart, 1, disk);
+    LXFSIdentification *id = (LXFSIdentification *)LXFS_BLOCK_BUFFER;
+
+    return id->rootBlock;
+}
+
 size_t readBlock(uint8_t disk, int partition, uint64_t start, size_t count, void *buffer) {
     uint32_t partitionStart = getPartitionStart(disk, partition);
     uint32_t blockSize = getBlockSize(disk, partition);

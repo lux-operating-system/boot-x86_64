@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /* File System Structures */
 
@@ -91,7 +92,13 @@ typedef struct {
 #define LXFS_DIR_TYPE_HARD_LINK     0x03
 
 /* implementation-specific constants */
-#define LXFS_BLOCK_BUFFER               0x70000
-#define LXFS_DIRECTORY_BUFFER           0x78000
+#define LXFS_BLOCK_BUFFER           0x70000
+#define LXFS_DIRECTORY_BUFFER       0x74000
+#define LXFS_TEXT_BUFFER            0x78000
 
 size_t readBlock(uint8_t, int, uint64_t, size_t, void *);
+uint64_t getNextBlock(uint8_t, int, uint32_t);
+uint64_t readNextBlock(uint8_t, int, uint64_t, void *);
+uint64_t getRootDirectory(uint8_t, int);
+
+bool lxfsFindPath(uint8_t, int, const char *, LXFSDirectoryEntry *);
