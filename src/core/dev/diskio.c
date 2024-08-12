@@ -12,7 +12,7 @@
 #define DISK_BUFFER         0x100   // temporary buffer in low memory
 
 DiskAddressPacket dap;
-CPURegisters regs;
+static CPURegisters regs;
 int partitionIndex;
 
 void diskAPI(CPURegisters *r) {
