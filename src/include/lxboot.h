@@ -45,6 +45,49 @@ typedef struct {
     uint64_t lba;
 } __attribute__((packed)) DiskAddressPacket;
 
+/* this structure is passed to the kernel */
+typedef struct {
+    uint32_t magic;         // 0x5346584C
+    uint32_t version;       // 1
+
+    uint8_t flags;
+
+    /* BIOS-specific info */
+    uint8_t biosBootDisk;
+    uint8_t bootBootPartitionIndex;
+    MBRPartition biosBootPartition;
+
+    /* TODO: UEFI info */
+    uint8_t uefiReserved[32];
+
+    /* generic info */
+    uint64_t memoryMap;
+    uint8_t memoryMapSize;
+
+    uint16_t width;
+    uint16_t height;
+    uint8_t bpp;
+    uint64_t framebuffer;
+    uint8_t redPosition;
+    uint8_t redMask;
+    uint8_t greenPosition;
+    uint8_t greenMask;
+    uint8_t bluePosition;
+    uint8_t blueMask;
+
+    uint64_t ramdisk;           // pointer
+    uint64_t ramdiskSize;
+
+    uint8_t moduleCount;
+    uint64_t modules;           // pointer to pointers
+    uint64_t moduleSizes;       // pointer to array of uint64_t's
+
+    char arguments[256];        // command-line arguments passed to the kernel
+} __attribute__((packed)) KernelBootInfo;
+
+#define BOOT_FLAGS_UEFI     0x01
+#define BOOT_FLAGS_GPT      0x02
+
 extern LXBootInfo bootInfo;
 extern CPURegisters *biosRegs;
 
