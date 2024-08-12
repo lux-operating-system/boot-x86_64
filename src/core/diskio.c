@@ -66,7 +66,7 @@ int findBootPartition() {
 }
 
 uint32_t getPartitionStart(uint8_t disk, int partition) {
-    readSector((void *)DISK_BUFFER, 0, 1, disk);
+    readSectors((void *)DISK_BUFFER, 0, 1, disk);
     MBRPartition *partitions = (MBRPartition *)((uint8_t *)DISK_BUFFER + MBR_PARTITION_OFFSET);
     return partitions[partition%4].start;
 }
