@@ -48,5 +48,7 @@ typedef struct {
 extern LXBootInfo bootInfo;
 extern CPURegisters *biosRegs;
 
+/* disk i/o */
 int readSectors(void *, uint32_t, int, uint8_t);
 int findBootPartition();
+uint32_t getPartitionStart(uint8_t, int);
