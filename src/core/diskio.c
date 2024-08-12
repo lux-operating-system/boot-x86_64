@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DISK_BUFFER         0x100   // temporary buffer in low memory
+
 DiskAddressPacket dap;
 CPURegisters regs;
 
@@ -25,7 +27,7 @@ int readSectors(void *dst, uint32_t lba, int count) {
     for(int i = 0; i < count; i++) {
         dap.count = 1;
         dap.segment = 0;
-        dap.offset = 0x100;     // temporary buffer
+        dap.offset = DISK_BUFFER;
         dap.lba = lba + i;
 
         regs.eax = 0x4200;
@@ -39,7 +41,7 @@ int readSectors(void *dst, uint32_t lba, int count) {
             return i;
         }
 
-        memcpy(dst + (i * 512), (const void *)0x100, 512);
+        memcpy(dst + (i * 512), (const void *)DISK_BUFFER, 512);
     }
 
     return count;
