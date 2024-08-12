@@ -14,12 +14,6 @@
 
 /* partial implementation of C stdio */
 
-void videoAPI(CPURegisters *regs) {
-    void (*v)(CPURegisters *) = (void (*))bootInfo.videoAPI;
-    memcpy(biosRegs, regs, sizeof(CPURegisters));
-    v(biosRegs);
-}
-
 int putchar(int c) {
     CPURegisters regs;
 
