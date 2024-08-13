@@ -21,6 +21,7 @@ typedef struct {
     uint32_t videoAPI;      /* callable routines for BIOS API functions */
     uint32_t diskAPI;
     uint32_t keyboardAPI;
+    uint32_t miscAPI;
     uint32_t regs;
 } __attribute__((packed)) LXBootInfo;
 
