@@ -119,7 +119,8 @@ partition:
 
                     dd video_api        ; this will allow BIOS calls
                     dd disk_api
-                    dd 0    ; keyboard_api
+                    dd 0                ; keyboard_api
+                    dd misc_api
 
                     dd registers
 
