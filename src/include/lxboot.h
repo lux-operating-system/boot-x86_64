@@ -46,6 +46,23 @@ typedef struct {
     uint64_t lba;
 } __attribute__((packed)) DiskAddressPacket;
 
+/* E820h Memory Map */
+typedef struct {
+    uint64_t base;
+    uint64_t len;
+    uint32_t type;
+    uint32_t acpiAttributes;
+} __attribute__((packed)) MemoryMap;
+
+#define MEMORY_TYPE_USABLE              1
+#define MEMORY_TYPE_RESERVED            2
+#define MEMORY_TYPE_ACPI_RECLAIMABLE    3
+#define MEMORY_TYPE_ACPI_NVS            4
+#define MEMORY_TYPE_BAD                 5
+
+#define MEMORY_ATTRIBUTES_VALID         0x01
+#define MEMORY_ATTRIBUTES_NV            0x02
+
 /* this structure is passed to the kernel */
 typedef struct {
     uint32_t magic;         // 0x5346584C
@@ -99,3 +116,6 @@ void diskAPI(CPURegisters *);
 int readSectors(void *, uint32_t, int, uint8_t);
 int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
+
+/* memory detection */
+int detectMemory();

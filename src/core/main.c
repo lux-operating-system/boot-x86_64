@@ -18,6 +18,7 @@ int main(LXBootInfo *boot) {
     biosRegs = (CPURegisters *)boot->regs;
 
     findBootPartition();
+    detectMemory();
 
     return 0;
 }
