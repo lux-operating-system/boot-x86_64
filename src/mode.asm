@@ -79,8 +79,87 @@ rmode:
 
 .return:                dw 0
 
+[bits 32]
+
+; lmode: switches the CPU to 64-bit long mode
+; void lmode(uint32_t paging, uint32_t entry, KernelBootInfo *k)
+
+align 4
+lmode:
+    pop eax                     ; discard return address as we will never return
+    pop eax                     ; paging
+    mov cr3, eax
+    pop eax                     ; entry
+    mov [.entry], eax
+    pop eax                     ; k
+    mov [.k], eax
+
+    ; we'll need to switch back to 16-bit mode for a moment to notify the BIOS
+    call rmode
+
+[bits 16]
+
+    mov eax, 0xEC00
+    mov ebx, 2
+    int 0x15
+
+    ; now we can switch back to 32-bit mode and continue the setup
+    call pmode
+
+[bits 32]
+
+    ; configure the CPU
+    mov eax, 0x6A0              ; enable SSE, PAE, and global pages
+    mov cr4, eax
+
+    mov eax, cr0
+    and eax, 0xBFFFFFFF         ; enable global caching
+    mov eax, cr0
+
+    mov ecx, 0xC0000080
+    rdmsr
+    or eax, 0x100               ; enable 64-bit mode
+    wrmsr
+
+    mov eax, cr0
+    or eax, 0x80010000          ; enable paging and write-protection
+    mov cr0, eax
+
+    jmp 0x28:.next              ; reset code segment
+
+[bits 64]
+
+.next:
+    ; by now we're in true 64-bit mode
+    mov rax, 0x30
+    mov ss, rax
+    mov ds, rax
+    mov es, rax
+    mov fs, rax
+    mov gs, rax
+    mov rbx, 0xFFFFFFFF
+    and rsp, rbx            ; zero extension
+
+    mov eax, [.entry]
+    and rax, rbx
+    mov edi, [.k]
+    and rdi, rbx
+
+    cld
+    call rax                ; kernel entry point taking KernelBootInfo * as a parameter
+
+.hang:
+    ; the kernel should never return
+    cli
+    hlt
+    jmp .hang
+
+align 4
+.entry:                 dd 0
+.k:                     dd 0
+
 ; Global Descriptor Table
-align 8
+align 16
 gdt:
     ; null descriptor
     gdt_null:
@@ -122,9 +201,27 @@ gdt:
         .flags:         db 0x0F     ; byte granularity, 16-bit
         .base_hi:       db 0x00
 
+    ; 64-bit code descriptor
+    gdt_code64:
+        .limit:         dw 0xFFFF
+        .base_lo:       dw 0x0000
+        .base_mi:       db 0x00
+        .access:        db 0x9A     ; present, segment, executable, read access
+        .flags:         db 0xAF     ; page granularity, 64-bit
+        .base_hi:       db 0x00
+
+    ; 64-bit data descriptor
+    gdt_data64:
+        .limit:         dw 0xFFFF
+        .base_lo:       dw 0x0000
+        .base_mi:       db 0x00
+        .access:        db 0x92     ; present, segment, non-executable, write access
+        .flags:         db 0xAF     ; page granularity, 64-bit
+        .base_hi:       db 0x00
+
 gdt_end:
 
-align 8
+align 16
 gdtr:
     .limit:             dw gdt_end - gdt - 1
     .base:              dq gdt

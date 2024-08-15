@@ -118,5 +118,5 @@ typedef struct {
 #define VBE_ENABLE_CRTC             0x0800
 #define VBE_ENABLE_LINEAR_FB        0x4000
 
-int vbeSetup();
+VBEMode *vbeSetup();
 VBEMode *vbeSetMode(uint16_t, uint16_t, uint8_t);

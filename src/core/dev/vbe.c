@@ -16,7 +16,7 @@ VBEMonitor monitor;
 static uint16_t *modes;
 static CPURegisters regs;
 
-int vbeSetup() {
+VBEMode *vbeSetup() {
     // check if VESA BIOS is supported at all
     memcpy(&controller.signature, "VBE2", 4);
     regs.eax = 0x4F00;
@@ -53,12 +53,14 @@ int vbeSetup() {
         printf("vbe: preferred resolution is %dx%d\n", preferredWidth, preferredHeight);
     }
 
-    if(vbeSetMode(preferredWidth, preferredHeight, 32)) return 0;
+    VBEMode *mode = vbeSetMode(preferredWidth, preferredHeight, 32);
+    if(mode) return mode;
 
     // here we somehow failed to set preferred resolution, so try again
     preferredWidth = 1024;
     preferredHeight = 768;
-    if(vbeSetMode(preferredWidth, preferredHeight, 32)) return 0;
+    mode = vbeSetMode(preferredWidth, preferredHeight, 32);
+    if(mode) return mode;
 
     printf("vbe: failed to set screen resolution\n");
     while(1);
