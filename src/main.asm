@@ -33,7 +33,6 @@ main:
     rep movsw           ; partition
 
     mov ds, ax
-    mov ax, 0
     mov ss, ax
     mov sp, 0x500
 
@@ -42,6 +41,29 @@ main:
     ; show signs of life
     mov si, life
     call print
+
+    ; make sure we have a 64-bit CPU
+    mov eax, 0x80000001
+    cpuid
+    and edx, 0x20000000     ; amd64 capability bit
+    jz error.old_cpu
+
+    ; and at least 16 MB ram
+    clc
+    xor cx, cx
+    xor dx, dx
+    mov ax, 0xE801
+    int 0x15
+    jc error.no_memory
+
+    jcxz .check_memory
+
+    mov ax, cx
+    mov bx, dx
+
+.check_memory:
+    and bx, bx              ; bx = memory pages above 16 MB
+    jz error.no_memory
 
     ; enable a20 gate
     clc
@@ -86,6 +108,23 @@ main:
 
 [bits 16]
 
+; error handlers
+error:
+
+.no_memory:
+    mov si, no_memory
+    call print
+    jmp .hang
+
+.old_cpu:
+    mov si, old_cpu
+    call print
+
+.hang:
+    sti
+    hlt
+    jmp .hang
+
 print:
     cld
 
@@ -104,6 +143,8 @@ print:
 %include "src/bios.asm"
 
 life:                       db "lux boot program", 13, 10, 0
+no_memory:                  db "not enough memory present", 0
+old_cpu:                    db "not a 64-bit cpu", 0
 
 ; this structure will be passed on to the next stage
 boot_info:
