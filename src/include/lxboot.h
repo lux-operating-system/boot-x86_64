@@ -25,6 +25,7 @@ typedef struct {
     uint32_t diskAPI;
     uint32_t keyboardAPI;
     uint32_t miscAPI;
+    uint32_t lmode;         /* pointer to void lmode(uint32_t paging, uint32_t entry) */
     uint32_t regs;
 } __attribute__((packed)) LXBootInfo;
 
@@ -116,6 +117,7 @@ void videoAPI(CPURegisters *);
 void diskAPI(CPURegisters *);
 
 /* disk i/o */
+extern int partitionIndex;      // boot partition
 int readSectors(void *, uint32_t, int, uint8_t);
 int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
@@ -125,4 +127,4 @@ int detectMemory();
 
 /* long mode setup */
 void pagingSetup();
-void lmode(uint32_t);
+void lmode(uint32_t, uint32_t, KernelBootInfo *);

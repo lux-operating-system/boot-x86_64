@@ -162,8 +162,9 @@ partition:
                     dd disk_api
                     dd 0                ; keyboard_api
                     dd misc_api
+                    dd lmode
 
                     dd registers
 
-times 0x300 - ($-$$) db 0                   ; pad out to 0x800
+times 0x400 - ($-$$) db 0                   ; pad out to 0x900
 pmode_program:      incbin "lxboot.core"

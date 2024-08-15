@@ -79,6 +79,27 @@ rmode:
 
 .return:                dw 0
 
+[bits 32]
+
+; lmode: switches the CPU to 64-bit long mode
+; void lmode(uint32_t paging, uint32_t entry, KernelBootInfo *k)
+
+align 4
+lmode:
+    add esp, 4          ; discard return address as we will never return
+    mov eax, [esp]
+    mov cr3, eax
+    mov eax, [esp+4]
+    mov [.entry], eax
+    mov eax, [esp+8]
+    mov [.k], eax
+
+    cli
+    hlt
+
+.entry:                 dd 0
+.k:                     dd 0
+
 ; Global Descriptor Table
 align 8
 gdt:
