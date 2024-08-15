@@ -113,7 +113,6 @@ lmode:
     mov cr4, eax
 
     mov eax, cr0
-    or eax, 0x00010000          ; enable write protection
     and eax, 0xBFFFFFFF         ; enable global caching
     mov eax, cr0
 
@@ -123,7 +122,7 @@ lmode:
     wrmsr
 
     mov eax, cr0
-    or eax, 0x80000000          ; enable paging
+    or eax, 0x80010000          ; enable paging and write-protection
     mov cr0, eax
 
     jmp 0x28:.next              ; reset code segment
