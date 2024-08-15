@@ -31,7 +31,7 @@ void pagingSetup() {
     // this is only here to reduce my own confusion as i try to build this
     // 2 MiB pages would go in the PD, 1 GiB pages would go in the PDP, etc
 
-    // we will build 1 PML4, 1 PDP, and 1 PD using 2 MiB pages to map 1 GiB
+    // we will build 1 PML4, 1 PDP, and 4 PDs using 2 MiB pages to map 4 GiB
     // we will omit the PT and leave it to the kernel to rebuild everything
     // TODO: check if ALL x86_64 CPUs are obligated to implement 2 MiB pages
     printf("paging: setup at 0x%08X\n", PAGING_BASE);
@@ -48,10 +48,17 @@ void pagingSetup() {
     }
 
     pml4[0] = (uint64_t)pdp | PAGE_PRESENT | PAGE_RW;
-    pdp[0] = (uint64_t)pd | PAGE_PRESENT | PAGE_RW;
 
-    for(int i = 0; i < 512; i++) {
-        pd[i] = (i * 0x200000);
+    for(int i = 0; i < 4; i++) {
+        pdp[i] = (uint64_t)pd + (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_RW;
+    }
+
+    uint64_t addr = 0;
+    for(int i = 0; i < 2048; i++) {
+        //pd[i] = (i * 0x200000);
+        // commented the above to avoid 64-bit mult while still in 32-bit mode
+        pd[i] = addr;
         pd[i] |= PAGE_PRESENT | PAGE_RW | PAGE_SIZE_EXTENSION;
+        addr += 0x200000;
     }
 }
