@@ -11,6 +11,9 @@
 #include <stddef.h>
 #include <lxfs.h>
 
+#define PAGING_BASE         0x100000    // 1 MB mark
+#define PAGE_SIZE           4096
+
 /* Boot Protocol */
 
 /* this structure is passed from the earlier stage boot loader */
@@ -119,3 +122,7 @@ uint32_t getPartitionStart(uint8_t, int);
 
 /* memory detection */
 int detectMemory();
+
+/* long mode setup */
+void pagingSetup();
+void lmode(uint32_t);
