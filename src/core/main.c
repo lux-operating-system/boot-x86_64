@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <lxfs.h>
 #include <elf.h>
+#include <vbe.h>
 
 #define KERNEL_BUFFER       (void *)0x100000
 
@@ -23,8 +24,7 @@ int main(LXBootInfo *boot) {
     biosRegs = (CPURegisters *)boot->regs;
 
     findBootPartition();
-    detectMemory();
-    pagingSetup();
+    int memoryMapSize = detectMemory();
 
     printf("loading kernel...\n");
 
@@ -41,8 +41,43 @@ int main(LXBootInfo *boot) {
         while(1);
     }
 
+    // enable high resolution
+    VBEMode *videoMode = vbeSetup();
+
+    // this will be passed to the kernel so it has some info to start with
+    kernelBootInfo.magic = 0x5346584C;
+    kernelBootInfo.version = 1;
+    kernelBootInfo.flags = 0;           // BIOS
+    kernelBootInfo.biosBootDisk = bootInfo.bootDevice;
+    kernelBootInfo.biosBootPartitionIndex = partitionIndex;
+    memcpy(&kernelBootInfo.biosBootPartition, &bootInfo.partition, sizeof(MBRPartition));
+    kernelBootInfo.memoryMap = (uint64_t)memoryMap;
+    kernelBootInfo.memoryMapSize = memoryMapSize;
+
+    kernelBootInfo.width = videoMode->width;
+    kernelBootInfo.height = videoMode->height;
+    kernelBootInfo.bpp = videoMode->bpp;
+    kernelBootInfo.framebuffer = videoMode->framebuffer;
+    kernelBootInfo.redPosition = videoMode->redPosition;
+    kernelBootInfo.redMask = videoMode->redMask;
+    kernelBootInfo.greenPosition = videoMode->greenPosition;
+    kernelBootInfo.greenMask = videoMode->greenMask;
+    kernelBootInfo.bluePosition = videoMode->bluePosition;
+    kernelBootInfo.blueMask = videoMode->blueMask;
+
+    kernelBootInfo.ramdisk = 0;         // TODO
+    kernelBootInfo.ramdiskSize = 0;     // TODO
+    kernelBootInfo.moduleCount = 0;     // TODO
+    kernelBootInfo.modules = 0;         // TODO
+    kernelBootInfo.moduleSizes = 0;     // TODO
+    memset(kernelBootInfo.arguments, 0, 256);
+
+    // this has to be the LAST setup because of buffer overlaps and that we
+    // have very limited memory at this stage
+    pagingSetup();
     void (*lmode)(uint32_t, uint32_t, KernelBootInfo *) = (void (*))bootInfo.lmode;
     lmode(PAGING_BASE, kernelEntry, &kernelBootInfo);
 
-    return 0;
+    // the above function will never return
+    return -1;
 }

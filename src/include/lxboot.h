@@ -76,7 +76,7 @@ typedef struct {
 
     /* BIOS-specific info */
     uint8_t biosBootDisk;
-    uint8_t bootBootPartitionIndex;
+    uint8_t biosBootPartitionIndex;
     MBRPartition biosBootPartition;
 
     /* TODO: UEFI info */
@@ -124,6 +124,7 @@ uint32_t getPartitionStart(uint8_t, int);
 
 /* memory detection */
 int detectMemory();
+extern MemoryMap memoryMap[];
 
 /* long mode setup */
 void pagingSetup();
