@@ -12,6 +12,7 @@
 #include <lxfs.h>
 #include <elf.h>
 #include <vbe.h>
+#include <acpi.h>
 
 #define KERNEL_BUFFER       (void *)0x100000
 
@@ -25,6 +26,9 @@ int main(LXBootInfo *boot) {
 
     findBootPartition();
     int memoryMapSize = detectMemory();
+
+    ACPIRSDP *rsdp = findACPIRoot();
+    while(1);
 
     printf("loading kernel...\n");
 
