@@ -87,6 +87,7 @@ typedef struct {
     uint64_t kernelTotalSize;
     
     uint64_t acpiRSDP;
+    uint64_t highestPhysicalAddress;
     uint64_t memoryMap;
     uint8_t memoryMapSize;
 
@@ -127,7 +128,7 @@ int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
 
 /* memory detection */
-int detectMemory();
+int detectMemory(uint64_t *);
 extern MemoryMap memoryMap[];
 
 /* long mode setup */

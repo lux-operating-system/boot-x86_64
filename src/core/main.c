@@ -25,7 +25,8 @@ int main(LXBootInfo *boot) {
     biosRegs = (CPURegisters *)boot->regs;
 
     findBootPartition();
-    int memoryMapSize = detectMemory();
+    uint64_t highestPhysicalAddress;
+    int memoryMapSize = detectMemory(&highestPhysicalAddress);
     ACPIRSDP *rsdp = findACPIRoot();
 
     printf("loading kernel...\n");
@@ -57,6 +58,7 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.kernelHighestAddress = kernelHighestAddress;
     kernelBootInfo.kernelTotalSize = kernelHighestAddress - 0x200000;
     kernelBootInfo.acpiRSDP = (uint64_t)rsdp;
+    kernelBootInfo.highestPhysicalAddress = highestPhysicalAddress;
     kernelBootInfo.memoryMap = (uint64_t)memoryMap;
     kernelBootInfo.memoryMapSize = memoryMapSize;
 
