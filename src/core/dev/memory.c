@@ -18,8 +18,9 @@ void miscAPI(CPURegisters *r) {
     m(biosRegs);
 }
 
-int detectMemory() {
+int detectMemory(uint64_t *highest) {
     int c = 0;
+    uint64_t addr = 0;
 
     regs.ebx = 0;
 
@@ -48,6 +49,14 @@ int detectMemory() {
     }
 
     printf("memory map contains %d entries\n", c);
+
+    for(int i = 0; i < c; i++) {
+        if((memoryMap[i].base + memoryMap[i].len) > addr) {
+            addr = memoryMap[i].base + memoryMap[i].len;
+        }
+    }
+
+    *highest = addr;
     return c;
 }
 
