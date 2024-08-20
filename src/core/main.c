@@ -35,7 +35,8 @@ int main(LXBootInfo *boot) {
         while(1);
     }
 
-    uint32_t kernelEntry = (uint32_t)loadELF(KERNEL_BUFFER);
+    uint64_t kernelHighestAddress;
+    uint32_t kernelEntry = (uint32_t)loadELF(KERNEL_BUFFER, &kernelHighestAddress);
     if(!kernelEntry) {
         printf("could not parse kernel executable\n");
         while(1);
@@ -51,6 +52,8 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.biosBootDisk = bootInfo.bootDevice;
     kernelBootInfo.biosBootPartitionIndex = partitionIndex;
     memcpy(&kernelBootInfo.biosBootPartition, &bootInfo.partition, sizeof(MBRPartition));
+    kernelBootInfo.kernelHighestAddress = kernelHighestAddress;
+    kernelBootInfo.kernelTotalSize = kernelHighestAddress - 0x200000;
     kernelBootInfo.memoryMap = (uint64_t)memoryMap;
     kernelBootInfo.memoryMapSize = memoryMapSize;
 

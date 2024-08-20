@@ -83,6 +83,9 @@ typedef struct {
     uint8_t uefiReserved[32];
 
     /* generic info */
+    uint64_t kernelHighestAddress;
+    uint64_t kernelTotalSize;
+    
     uint64_t memoryMap;
     uint8_t memoryMapSize;
 
