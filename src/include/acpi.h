@@ -9,6 +9,9 @@
 
 #include <stdint.h>
 
+#define RSDP_LEGACY_SIZE        20
+#define RSDP_EXTENDED_SIZE      (sizeof(ACPIRSDP) - RSDP_LEGACY_SIZE)
+
 typedef struct {
     // revision == 0
     char signature[8];      // 'RSD PTR '
