@@ -16,12 +16,15 @@
 /*
  * loadELF(): loads the sections of an ELF file
  * params: binary - pointer to the ELF header
+ * params: highest - pointer to where to store kernel's highest address
  * returns: absolute address of the entry point, zero on fail
  */
 
-uint64_t loadELF(const void *binary) {
+uint64_t loadELF(const void *binary, uint64_t *highest) {
     uint8_t *ptr = (uint8_t *)binary;
     ELFFileHeader *header = (ELFFileHeader *)ptr;
+
+    uint64_t addr = 0;
 
     if(header->magic[0] != 0x7F || header->magic[1] != 'E' ||
     header->magic[2] != 'L' || header->magic[3] != 'F') {
@@ -61,6 +64,11 @@ uint64_t loadELF(const void *binary) {
             // for the same reason we're also ignoring the exec/read/write perms
             memset((void *)(uint32_t)prhdr->virtualAddress, 0, prhdr->memorySize);
             memcpy((void *)(uint32_t)prhdr->virtualAddress, (const void *)(uint32_t)(binary + prhdr->fileOffset), prhdr->fileSize);
+
+            // take note of the highest address
+            if((prhdr->virtualAddress + prhdr->memorySize) > addr) {
+                addr = prhdr->virtualAddress + prhdr->memorySize;
+            }
         } else {
             printf("unimplemented type %d, aborting...\n", prhdr->segmentType);
             return 0;
@@ -72,5 +80,7 @@ uint64_t loadELF(const void *binary) {
     }
 
     printf("elf: entry point is at 0x%08X\n", header->entryPoint);
+    printf("elf: highest address used by kernel is at 0x%08X\n", addr);
+    *highest = addr;
     return header->entryPoint;
 }

@@ -71,4 +71,4 @@ typedef struct {
 #define ELF_SEGMENT_FLAGS_WRITE     0x02
 #define ELF_SEGMENT_FLAGS_READ      0x04
 
-uint64_t loadELF(const void *);
+uint64_t loadELF(const void *, uint64_t *);
