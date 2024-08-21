@@ -18,13 +18,20 @@ static CPURegisters regs;
 
 VBEMode *vbeSetup() {
     // check if VESA BIOS is supported at all
-    memcpy(&controller.signature, "VBE2", 4);
+    memset(&controller, 0, sizeof(VBEController));
+    memcpy(&controller.signature, "VBE2", 4);   // this is a magic number and doesn't mean version 2
+    controller.version = 0x300; // indicate to the firmware we implement VESA 3.0
     regs.eax = 0x4F00;
     regs.edi = (uint32_t)&controller;
     videoAPI(&regs);
 
     if((biosRegs->eax & 0xFFFF) != 0x004F || memcmp(&controller.signature, "VESA", 4)) {
         printf("vbe: failed to query display controller, status 0x%04X\n", biosRegs->eax & 0xFFFF);
+        while(1);
+    }
+
+    if(controller.version < 0x200) {
+        printf("vbe: VESA BIOS version is less than 2.0: 0x%04X\n", controller.version);
         while(1);
     }
 
@@ -72,7 +79,7 @@ VBEMode *vbeSetMode(uint16_t w, uint16_t h, uint8_t bpp) {
     for(int i = 0; modes[i] != 0xFFFF; i++) {
         // query the BIOS for each mode one by one
         regs.eax = 0x4F01;
-        regs.ecx = modes[i] & 0xFFFF;
+        regs.ecx = modes[i] & 0x01FF;
         regs.edi = (uint32_t)&mode;
         videoAPI(&regs);
 
@@ -88,7 +95,7 @@ VBEMode *vbeSetMode(uint16_t w, uint16_t h, uint8_t bpp) {
             printf("vbe: found mode 0x%04X\n", modes[i]);
             
             regs.eax = 0x4F02;
-            regs.ebx = modes[i] & ~(VBE_ENABLE_CRTC);
+            regs.ebx = modes[i] & 0x01FF;
             regs.ebx |= VBE_ENABLE_LINEAR_FB;
             regs.edi = 0;
             videoAPI(&regs);
@@ -102,5 +109,6 @@ VBEMode *vbeSetMode(uint16_t w, uint16_t h, uint8_t bpp) {
         }
     }
 
+    printf("vbe: mode not supported on the controller\n");
     return NULL;
 }
