@@ -21,7 +21,7 @@ bool lxfsRead(uint8_t disk, int partition, const char *path, void *buffer) {
     size_t count = 0;
     int blockSizeBytes = getBlockSize(disk, partition) * getSectorSize(disk, partition);
 
-    while(block != LXFS_BLOCK_EOF && count < 5) {
+    while(block != LXFS_BLOCK_EOF) {
         //printf("lxfs: reading block %d\n", block);
         block = readNextBlock(disk, partition, block, buffer + (blockSizeBytes * count));
         count++;
