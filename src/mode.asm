@@ -109,6 +109,21 @@ lmode:
     mov ebx, 2
     int 0x15
 
+    ; mask all interrupts and allow queued interrupts to be handled
+    mov al, 0xFF
+    out 0x21, al
+    out 0xA1, al
+
+    mov ecx, 0xFFF
+
+.wait:
+    sti
+    nop
+    nop
+    nop
+    nop
+    loop .wait
+
     ; now we can switch back to 32-bit mode and continue the setup
     call pmode
 
