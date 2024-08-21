@@ -56,6 +56,13 @@ rmode:
 [bits 16]
 
 .next:
+    mov ax, 0x20
+    mov ss, ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
     ; here we're in 16-bit protected mode
     mov eax, cr0
     and al, 0xFE
@@ -70,7 +77,6 @@ rmode:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    mov sp, 0x500
 
     sti
 
