@@ -66,6 +66,7 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.height = videoMode->height;
     kernelBootInfo.bpp = videoMode->bpp;
     kernelBootInfo.framebuffer = videoMode->framebuffer;
+    kernelBootInfo.pitch = videoMode->pitch;
     kernelBootInfo.redPosition = videoMode->redPosition;
     kernelBootInfo.redMask = videoMode->redMask;
     kernelBootInfo.greenPosition = videoMode->greenPosition;
