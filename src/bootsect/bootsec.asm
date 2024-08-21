@@ -93,7 +93,7 @@ main:
 
     ; ensure validity of the program
     push ds
-    mov ax, 0x50
+    mov ax, 0x100
     mov ds, ax
     xor si, si
     mov eax, [si]
@@ -104,7 +104,7 @@ main:
     ; now run the boot program
     mov si, partition
     mov dl, [boot_disk]
-    jmp 0x0000:0x0540
+    jmp 0x0000:0x1040
 
     .drive_error:
         mov si, drive_error
@@ -148,7 +148,7 @@ dap:
     .reserved       db 0
     .count          dw 0
     .offset         dw 0x0000
-    .segment        dw 0x0050
+    .segment        dw 0x0100
     .lba            dq 0
 
 drive_error:        db "disk i/o error", 0

@@ -3,7 +3,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x900;
+    . = 0x2000;
 
     .stub BLOCK(8) : ALIGN(8)
     {

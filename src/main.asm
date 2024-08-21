@@ -6,7 +6,7 @@
 ; main.asm: Entry Point
 
 [bits 16]
-[org 0x500]
+[org 0x1000]
 
 ; LXFS Identification Block
 lxfs_boot_id:
@@ -34,7 +34,7 @@ main:
 
     mov ds, ax
     mov ss, ax
-    mov sp, 0x500
+    mov sp, 0x1000
 
     sti
 
@@ -166,5 +166,5 @@ partition:
 
                     dd registers
 
-times 0x400 - ($-$$) db 0                   ; pad out to 0x900
+times 0x1000 - ($-$$) db 0                   ; pad out to 0x2000
 pmode_program:      incbin "lxboot.core"
