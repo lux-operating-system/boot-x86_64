@@ -42,11 +42,15 @@ main:
     mov si, life
     call print
 
-    ; make sure we have a 64-bit CPU
+    ; make sure we have a CPU with the required features
     mov eax, 0x80000001
     cpuid
-    and edx, 0x20000000     ; amd64 capability bit
+    test edx, 0x20000000    ; amd64 capability bit
     jz error.old_cpu
+    test edx, 0x100000      ; no-execute bit
+    jz error.no_nx
+    test edx, 0x800         ; syscall
+    jz error.no_syscall
 
     ; and at least 16 MB ram
     clc
@@ -119,6 +123,16 @@ error:
 .old_cpu:
     mov si, old_cpu
     call print
+    jmp .hang
+
+.no_nx:
+    mov si, no_nx
+    call print
+    jmp .hang
+
+.no_syscall:
+    mov si, no_syscall
+    call print
 
 .hang:
     sti
@@ -145,6 +159,8 @@ print:
 life:                       db "lux boot program", 13, 10, 0
 no_memory:                  db "not enough memory present", 0
 old_cpu:                    db "not a 64-bit cpu", 0
+no_nx:                      db "cpu doesn't support pae/nx", 0
+no_syscall:                 db "cpu doesn't support syscall/sysret instructions", 0
 
 ; this structure will be passed on to the next stage
 boot_info:
