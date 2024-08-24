@@ -49,8 +49,8 @@ main:
     jz error.old_cpu
     test edx, 0x100000      ; no-execute bit
     jz error.no_nx
-    test edx, 0x800         ; syscall
-    jz error.no_syscall
+    ;test edx, 0x800         ; syscall
+    ;jz error.no_syscall
 
     ; and at least 16 MB ram
     clc
