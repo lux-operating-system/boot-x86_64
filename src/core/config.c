@@ -91,7 +91,7 @@ BootConfig *selectBootOption(int option) {
         }
     }
 
-    printf("config: selected boot option %d\n", option);
+    //printf("config: selected boot option %d\n", option);
 
     memset(config.disk, 0, CONFIG_MAX_NAME);
     memset(config.name, 0, CONFIG_MAX_NAME);
@@ -108,31 +108,38 @@ BootConfig *selectBootOption(int option) {
     while(memcmp(entry, "boot", 4)) {
         if(!memcmp(entry, "name ", 5)) {
             copyLine(config.name, entry + 5);
-            printf("config: OS name is '%s'\n", config.name);
+            //printf("config: OS name is '%s'\n", config.name);
         } else if(!memcmp(entry, "disk ", 5)) {
             copyLine(config.disk, entry + 5);
-            printf("config: booting from disk '%s'\n", config.disk);
+            //printf("config: booting from disk '%s'\n", config.disk);
         } else if(!memcmp(entry, "kernel ", 7)) {
             copyWord(config.kernel, entry + 7);
-            printf("config: booting kernel '%s'\n", config.kernel);
+            //printf("config: booting kernel '%s'\n", config.kernel);
 
             if(entry[7 + strlen(config.kernel)] == ' ') {
                 copyLine(config.arguments, entry + 8 + strlen(config.kernel));
-                printf("config: kernel arguments '%s'\n", config.arguments);
+                //printf("config: kernel arguments '%s'\n", config.arguments);
             }
         } else if(!memcmp(entry, "ramdisk ", 8)) {
             copyLine(config.ramdisk, entry + 8);
-            printf("config: using ramdisk '%s'\n", config.ramdisk);
+            //printf("config: using ramdisk '%s'\n", config.ramdisk);
         } else if(!memcmp(entry, "module ", 7)) {
             appendLine(config.modules, entry + 7);
             appendLine(config.modules, " ");
-            printf("config: kernel boot module '%s'\n", copyLine(line, entry + 7));
+            //printf("config: kernel boot module '%s'\n", copyLine(line, entry + 7));
+            config.moduleCount++;
         } else {
             printf("config: undefined command '%s', aborting\n", copyLine(line, entry));
             while(1);
         }
 
         entry = skipLine(entry);
+    }
+
+    // verify boot option
+    if(!strlen(config.kernel) || !strlen(config.disk)) {
+        printf("boot option does not specify kernel or boot device\n");
+        while(1);
     }
 
     return &config;
