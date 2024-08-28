@@ -58,12 +58,14 @@ int main(LXBootInfo *boot) {
         while(1);
     }
 
-    uint64_t kernelHighestAddress;
+    uint64_t lowestUsableAddress, kernelHighestAddress;
     uint32_t kernelEntry = (uint32_t)loadELF(KERNEL_BUFFER, &kernelHighestAddress);
     if(!kernelEntry) {
         printf("could not parse kernel executable\n");
         while(1);
     }
+
+    lowestUsableAddress = kernelHighestAddress;
 
     // load the ramdisk if present
     uint64_t ramdisk = 0;
@@ -71,21 +73,52 @@ int main(LXBootInfo *boot) {
     if(strlen(option->ramdisk)) {
         printf("loading ramdisk %s...\n", option->ramdisk);
 
-        ramdisk = forcePageAlignment(kernelHighestAddress);
+        ramdisk = forcePageAlignment(lowestUsableAddress);
         if(!lxfsRead(bootInfo.bootDevice, partitionIndex, option->ramdisk, (void *)ramdisk)) {
             printf("could not load %s\n", option->ramdisk);
             while(1);
         }
 
         ramdiskSize = lxfsSize(bootInfo.bootDevice, partitionIndex, option->ramdisk);
+
+        lowestUsableAddress = ramdisk + ramdiskSize;
     }
 
-    while(1);
+    // load modules if present
+    char module[CONFIG_MAX_MODULES];
+    uint64_t moduleAddress;
+    uint64_t moduleSize;
+    if(option->moduleCount) {
+        for(int i = 0; i < option->moduleCount; i++) {
+            if(!copyModule(module, option->modules, i)) {
+                printf("failed to load modules\n");
+                while(1);
+            }
+
+            printf("loading module %d of %d: %s...\n", i+1, option->moduleCount, module);
+            
+            moduleAddress = forcePageAlignment(lowestUsableAddress);
+
+            strcpy((char *)moduleAddress, module);
+
+            if(!lxfsRead(bootInfo.bootDevice, partitionIndex, module, (void *)moduleAddress + strlen(module) + 1)) {
+                printf("could not load %s\n", module);
+                while(1);
+            }
+
+            moduleSize = lxfsSize(bootInfo.bootDevice, partitionIndex, module);
+            lowestUsableAddress = moduleAddress + moduleSize + strlen(module) + 1;
+
+            kernelBootInfo.modules[i] = moduleAddress;
+            kernelBootInfo.moduleSizes[i] = moduleSize;
+        }
+    }
 
     // enable high resolution
     VBEMode *videoMode = vbeSetup();
 
     // this will be passed to the kernel so it has some info to start with
+    memset(&kernelBootInfo, 0, sizeof(KernelBootInfo));
     kernelBootInfo.magic = 0x5346584C;
     kernelBootInfo.version = 1;
     kernelBootInfo.flags = 0;           // BIOS
@@ -111,8 +144,15 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.bluePosition = videoMode->bluePosition;
     kernelBootInfo.blueMask = videoMode->blueMask;
 
+    kernelBootInfo.ramdisk = ramdisk;
+    kernelBootInfo.ramdiskSize = ramdiskSize;
 
-    memset(kernelBootInfo.arguments, 0, 256);
+    kernelBootInfo.moduleCount = option->moduleCount;
+    kernelBootInfo.lowestFreeMemory = forcePageAlignment(lowestUsableAddress);
+
+    strcpy(kernelBootInfo.arguments, option->kernel);
+    strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), " ");
+    strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), option->arguments);
 
     // this has to be the LAST setup because of buffer overlaps and that we
     // have very limited memory at this stage

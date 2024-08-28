@@ -153,6 +153,7 @@ typedef struct {
 
 int loadConfig(const char *);
 BootConfig *selectBootOption(int);
+char *copyModule(char *, char *, int);
 
 /* memory detection */
 int detectMemory(uint64_t *);

@@ -77,6 +77,20 @@ static char *appendLine(char *dest, char *line) {
     return copyLine(dest + strlen(dest), line);
 }
 
+char *copyModule(char *dest, char *modules, int index) {
+    int count = 0;
+    int i;
+    for(i = 0; i < strlen(modules); i++) {
+        if(count == index) break;
+        if(modules[i] == ' ') count++;
+    }
+
+    if(count != index) return NULL;
+
+    modules = modules+i;
+    return copyWord(dest, modules);
+}
+
 BootConfig *selectBootOption(int option) {
     if(option >= config.count) return NULL;
     char line[256];
@@ -139,6 +153,11 @@ BootConfig *selectBootOption(int option) {
     // verify boot option
     if(!strlen(config.kernel) || !strlen(config.disk)) {
         printf("boot option does not specify kernel or boot device\n");
+        while(1);
+    }
+
+    if(config.moduleCount > 16) {
+        printf("module count of %d is larger than the limit of 16\n", config.moduleCount);
         while(1);
     }
 
