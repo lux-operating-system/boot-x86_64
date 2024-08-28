@@ -129,18 +129,28 @@ int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
 
 /* configuration, modules, and ramdisk */
+#define CONFIG_MAX_NAME         32
+#define CONFIG_MAX_KERNEL       32
+#define CONFIG_MAX_ARGUMENTS    256
+#define CONFIG_MAX_MODULES      512
+
 typedef struct {
     size_t size;
     int count;      // how many boot options
     
     // these represent a selection
-    char name[16];
-    char kernel[16];
-    char command[256];
-    char modules[256];
+    char disk[CONFIG_MAX_NAME];
+    char name[CONFIG_MAX_NAME];
+    char kernel[CONFIG_MAX_KERNEL];
+    char ramdisk[CONFIG_MAX_KERNEL];
+    char arguments[CONFIG_MAX_ARGUMENTS];
+    char modules[CONFIG_MAX_MODULES];
+
+    int moduleCount;
 } BootConfig;
 
 int loadConfig(const char *);
+BootConfig *selectBootOption(int);
 
 /* memory detection */
 int detectMemory(uint64_t *);

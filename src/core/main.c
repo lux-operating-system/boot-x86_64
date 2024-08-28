@@ -34,6 +34,12 @@ int main(LXBootInfo *boot) {
 
     // TODO: display a menu letting the user choose a boot option
 
+    BootConfig *option = selectBootOption(0);
+    if(!option) {
+        printf("unable to select boot option\n");
+        while(1);
+    }
+
     while(1);
 
     printf("loading kernel...\n");
