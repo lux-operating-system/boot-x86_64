@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 bool lxfsRead(uint8_t disk, int partition, const char *path, void *buffer) {
-    printf("lxfs: reading %s from disk 0x%02X partition %d...\n", path, disk, partition);
+    //printf("lxfs: reading %s from disk 0x%02X partition %d...\n", path, disk, partition);
     LXFSDirectoryEntry *entry = (LXFSDirectoryEntry *)LXFS_DIRECTORY_BUFFER;
     if(!lxfsFindPath(disk, partition, path, entry)) return false;
 
