@@ -111,11 +111,7 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.bluePosition = videoMode->bluePosition;
     kernelBootInfo.blueMask = videoMode->blueMask;
 
-    kernelBootInfo.ramdisk = 0;         // TODO
-    kernelBootInfo.ramdiskSize = 0;     // TODO
-    kernelBootInfo.moduleCount = 0;     // TODO
-    kernelBootInfo.modules = 0;         // TODO
-    kernelBootInfo.moduleSizes = 0;     // TODO
+
     memset(kernelBootInfo.arguments, 0, 256);
 
     // this has to be the LAST setup because of buffer overlaps and that we
