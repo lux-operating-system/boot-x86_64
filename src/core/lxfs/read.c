@@ -30,3 +30,10 @@ bool lxfsRead(uint8_t disk, int partition, const char *path, void *buffer) {
 
     return count;   // aka true if we read anything at all
 }
+
+size_t lxfsSize(uint8_t disk, int partition, const char *path) {
+    LXFSDirectoryEntry *entry = (LXFSDirectoryEntry *)LXFS_DIRECTORY_BUFFER;
+    if(!lxfsFindPath(disk, partition, path, entry)) return 0;
+    if(((entry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) != LXFS_DIR_TYPE_FILE) return 0;
+    return entry->size;
+}
