@@ -29,6 +29,13 @@ int main(LXBootInfo *boot) {
     int memoryMapSize = detectMemory(&highestPhysicalAddress);
     ACPIRSDP *rsdp = findACPIRoot();
 
+    /* load the config file */
+    loadConfig("/lxboot.conf");
+
+    // TODO: display a menu letting the user choose a boot option
+
+    while(1);
+
     printf("loading kernel...\n");
 
     // TODO: read and parse the config file instead of hardcoding the kernel

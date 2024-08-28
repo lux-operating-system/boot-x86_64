@@ -128,6 +128,20 @@ int readSectors(void *, uint32_t, int, uint8_t);
 int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
 
+/* configuration, modules, and ramdisk */
+typedef struct {
+    size_t size;
+    int count;      // how many boot options
+    
+    // these represent a selection
+    char name[16];
+    char kernel[16];
+    char command[256];
+    char modules[256];
+} BootConfig;
+
+int loadConfig(const char *);
+
 /* memory detection */
 int detectMemory(uint64_t *);
 extern MemoryMap memoryMap[];
