@@ -151,8 +151,11 @@ int main(LXBootInfo *boot) {
     kernelBootInfo.lowestFreeMemory = forcePageAlignment(lowestUsableAddress);
 
     strcpy(kernelBootInfo.arguments, option->kernel);
-    strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), " ");
-    strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), option->arguments);
+
+    if(strlen(option->arguments)) {
+        strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), " ");
+        strcpy(kernelBootInfo.arguments + strlen(kernelBootInfo.arguments), option->arguments);
+    }
 
     // this has to be the LAST setup because of buffer overlaps and that we
     // have very limited memory at this stage
