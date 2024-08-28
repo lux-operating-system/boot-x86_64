@@ -20,6 +20,14 @@ LXBootInfo bootInfo;
 CPURegisters *biosRegs;
 KernelBootInfo kernelBootInfo;
 
+static uint64_t forcePageAlignment(uint64_t addr) {
+    while(addr & 0xFFF) {
+        addr++;
+    }
+
+    return addr;
+}
+
 int main(LXBootInfo *boot) {
     memcpy(&bootInfo, boot, sizeof(LXBootInfo));
     biosRegs = (CPURegisters *)boot->regs;
@@ -40,14 +48,13 @@ int main(LXBootInfo *boot) {
         while(1);
     }
 
-    while(1);
+    printf("booting %s...\n", option->name);
 
-    printf("loading kernel...\n");
+    // load the kernel
+    printf("loading kernel %s...\n", option->kernel);
 
-    // TODO: read and parse the config file instead of hardcoding the kernel
-    // this will have to be done in any case to implement module loading eventually
-    if(!lxfsRead(bootInfo.bootDevice, partitionIndex, "/lux", KERNEL_BUFFER)) {
-        printf("could not load /lux\n");
+    if(!lxfsRead(bootInfo.bootDevice, partitionIndex, option->kernel, KERNEL_BUFFER)) {
+        printf("could not load %s\n", option->kernel);
         while(1);
     }
 
@@ -57,6 +64,23 @@ int main(LXBootInfo *boot) {
         printf("could not parse kernel executable\n");
         while(1);
     }
+
+    // load the ramdisk if present
+    uint64_t ramdisk = 0;
+    size_t ramdiskSize = 0;
+    if(strlen(option->ramdisk)) {
+        printf("loading ramdisk %s...\n", option->ramdisk);
+
+        ramdisk = forcePageAlignment(kernelHighestAddress);
+        if(!lxfsRead(bootInfo.bootDevice, partitionIndex, option->ramdisk, (void *)ramdisk)) {
+            printf("could not load %s\n", option->ramdisk);
+            while(1);
+        }
+
+        ramdiskSize = lxfsSize(bootInfo.bootDevice, partitionIndex, option->ramdisk);
+    }
+
+    while(1);
 
     // enable high resolution
     VBEMode *videoMode = vbeSetup();
