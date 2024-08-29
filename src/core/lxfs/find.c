@@ -63,12 +63,12 @@ char *splitPath(char *dst, const char *p, int index) {
 
 bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEntry *dst) {
     int pathEntries = countPath(path);
-    printf("lxfs: attempt to find entry for path %s with %d entries\n", path, pathEntries);
+    //printf("lxfs: attempt to find entry for path %s with %d entries\n", path, pathEntries);
 
     if(pathEntries <= 1) {
         // root directory
         uint64_t rootBlock = getRootDirectory(disk, partition);
-        printf("lxfs: root directory is at block %d\n", rootBlock);
+        //printf("lxfs: root directory is at block %d\n", rootBlock);
         LXFSDirectoryHeader *rootHeader = (LXFSDirectoryHeader *)LXFS_DIRECTORY_BUFFER;
         readBlock(disk, partition, rootBlock, 1, rootHeader);
 
@@ -111,7 +111,7 @@ bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEn
 
         while(block != LXFS_BLOCK_EOF) {
             block = readNextBlock(disk, partition, block, entry);   // one block at a time
-            printf("%s\n", (char *)LXFS_TEXT_BUFFER);
+            //printf("%s\n", (char *)LXFS_TEXT_BUFFER);
 
             entry = (LXFSDirectoryEntry *)((uint8_t *)LXFS_DIRECTORY_BUFFER + sizeof(LXFSDirectoryHeader));
             directoryIndex = sizeof(LXFSDirectoryHeader);
@@ -134,7 +134,7 @@ bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEn
             // here we found something, determine if thats the final finding or not
             if(pathIndex == pathEntries-1) {
                 // we're done
-                printf("lxfs: found entry for %s\n", path);
+                //printf("lxfs: found entry for %s\n", path);
                 memcpy(dst, entry, entry->entrySize);
                 return true;
             }

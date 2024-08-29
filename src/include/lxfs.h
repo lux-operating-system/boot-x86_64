@@ -119,3 +119,4 @@ unsigned int getSectorSize(uint8_t, int);
 
 bool lxfsFindPath(uint8_t, int, const char *, LXFSDirectoryEntry *);
 bool lxfsRead(uint8_t, int, const char *, void *);
+size_t lxfsSize(uint8_t, int, const char *);

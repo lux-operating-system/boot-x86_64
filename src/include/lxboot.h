@@ -107,8 +107,10 @@ typedef struct {
     uint64_t ramdiskSize;
 
     uint8_t moduleCount;
-    uint64_t modules;           // pointer to pointers
-    uint64_t moduleSizes;       // pointer to array of uint64_t's
+    uint64_t modules[16];       // array of pointers
+    uint64_t moduleSizes[16];
+
+    uint64_t lowestFreeMemory;  // pointer to the end of highest ramdisk/module, aka lowest free memory
 
     char arguments[256];        // command-line arguments passed to the kernel
 } __attribute__((packed)) KernelBootInfo;
@@ -127,6 +129,31 @@ extern int partitionIndex;      // boot partition
 int readSectors(void *, uint32_t, int, uint8_t);
 int findBootPartition();
 uint32_t getPartitionStart(uint8_t, int);
+
+/* configuration, modules, and ramdisk */
+#define CONFIG_MAX_NAME         32
+#define CONFIG_MAX_KERNEL       32
+#define CONFIG_MAX_ARGUMENTS    256
+#define CONFIG_MAX_MODULES      1024
+
+typedef struct {
+    size_t size;
+    int count;      // how many boot options
+    
+    // these represent a selection
+    char disk[CONFIG_MAX_NAME];
+    char name[CONFIG_MAX_NAME];
+    char kernel[CONFIG_MAX_KERNEL];
+    char ramdisk[CONFIG_MAX_KERNEL];
+    char arguments[CONFIG_MAX_ARGUMENTS];
+    char modules[CONFIG_MAX_MODULES];
+
+    int moduleCount;
+} BootConfig;
+
+int loadConfig(const char *);
+BootConfig *selectBootOption(int);
+char *copyModule(char *, char *, int);
 
 /* memory detection */
 int detectMemory(uint64_t *);
