@@ -101,7 +101,7 @@ int main(LXBootInfo *boot) {
 
             strcpy((char *)moduleAddress, module);
 
-            if(!lxfsRead(bootInfo.bootDevice, partitionIndex, module, (void *)moduleAddress + strlen(module) + 1)) {
+            if(!lxfsRead(bootInfo.bootDevice, partitionIndex, module, (char *)moduleAddress + strlen((char *)moduleAddress) + 1)) {
                 printf("could not load %s\n", module);
                 while(1);
             }
@@ -118,7 +118,6 @@ int main(LXBootInfo *boot) {
     VBEMode *videoMode = vbeSetup();
 
     // this will be passed to the kernel so it has some info to start with
-    memset(&kernelBootInfo, 0, sizeof(KernelBootInfo));
     kernelBootInfo.magic = 0x5346584C;
     kernelBootInfo.version = 1;
     kernelBootInfo.flags = 0;           // BIOS
