@@ -1,7 +1,7 @@
 CCFLAGS=-c -I./src/include -ffreestanding -O2 -m32 -mno-sse
 LDFLAGS=-T./src/lxboot.ld -nostdlib -m elf_i386
-CC=x86_64-elf-gcc
-LD=x86_64-elf-ld
+CC=x86_64-lux-gcc
+LD=x86_64-lux-ld
 SRC:=$(shell find ./src/core -type f -name "*.c")
 OBJ:=$(SRC:.c=.o)
 
