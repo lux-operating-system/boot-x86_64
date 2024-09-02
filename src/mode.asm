@@ -130,7 +130,7 @@ lmode:
 [bits 32]
 
     ; configure the CPU
-    mov eax, 0x6A0              ; enable SSE, PAE, and global pages
+    mov eax, 0x620              ; SSE, PAE
     mov cr4, eax
 
     mov eax, cr0
