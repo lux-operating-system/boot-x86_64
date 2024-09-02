@@ -18,7 +18,7 @@
 
 void pagingSetup() {
     // creates page tables starting at PAGING_BASE
-    // identity-maps the first 1 GiB of memory to give the kernel a reasonable
+    // identity-maps the first 4 GiB of memory to give the kernel a reasonable
     // amount of space to start with
     
     // x86_64 uses 4-levels of paging: PML4 -> PDP -> PD -> PT
@@ -33,6 +33,7 @@ void pagingSetup() {
 
     // we will build 1 PML4, 1 PDP, and 4 PDs using 2 MiB pages to map 4 GiB
     // we will omit the PT and leave it to the kernel to rebuild everything
+    // the same 4 GiB will also be identity mapped at the lowest 4 GiB
     // TODO: check if ALL x86_64 CPUs are obligated to implement 2 MiB pages
     printf("paging: setup at 0x%08X\n", PAGING_BASE);
 
@@ -48,6 +49,7 @@ void pagingSetup() {
     }
 
     pml4[0] = (uint64_t)pdp | PAGE_PRESENT | PAGE_RW;
+    pml4[256] = (uint64_t)pdp | PAGE_PRESENT | PAGE_RW;
 
     for(int i = 0; i < 4; i++) {
         pdp[i] = (uint64_t)pd + (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_RW;
