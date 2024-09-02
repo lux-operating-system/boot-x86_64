@@ -81,6 +81,6 @@ uint64_t loadELF(const void *binary, uint64_t *highest) {
 
     //printf("elf: entry point is at 0x%08X\n", header->entryPoint);
     //printf("elf: highest address used by kernel is at 0x%08X\n", addr);
-    *highest = addr;
+    *highest = addr & 0xFFFFFFFF;
     return header->entryPoint;
 }
