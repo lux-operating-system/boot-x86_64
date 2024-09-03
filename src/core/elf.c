@@ -53,12 +53,14 @@ uint64_t loadELF(const void *binary, uint64_t *highest) {
         return 0;
     }
 
-    //printf("elf: total of %d %s present, loading...\n", header->headerEntryCount, header->headerEntryCount == 1 ? "segment" : "segments");
+    printf("elf: total of %d %s present, loading...\n", header->headerEntryCount, header->headerEntryCount == 1 ? "segment" : "segments");
     ELFProgramHeader *prhdr = (ELFProgramHeader *)(ptr + header->headerTable);
     for(int i = 0; i < header->headerEntryCount; i++) {
-        //printf(" %d: ", i);
-        if(prhdr->segmentType == ELF_SEGMENT_TYPE_LOAD) {
-            //printf("load %d file/%d memory -> 0x%08X", (uint32_t)prhdr->fileSize, (uint32_t)prhdr->memorySize, (uint32_t)prhdr->virtualAddress);
+        printf(" %d: ", i);
+        if(prhdr->segmentType == ELF_SEGMENT_TYPE_NULL) {
+            /* skip NULL  entries */
+        } else if(prhdr->segmentType == ELF_SEGMENT_TYPE_LOAD) {
+            printf("load %d file/%d memory -> 0x%08X", (uint32_t)prhdr->fileSize, (uint32_t)prhdr->memorySize, (uint32_t)prhdr->virtualAddress);
 
             // for now virtual=physical because we haven't yet enabled paging
             // for the same reason we're also ignoring the exec/read/write perms
@@ -76,7 +78,7 @@ uint64_t loadELF(const void *binary, uint64_t *highest) {
 
         //printf("\n");
 
-        prhdr = (ELFProgramHeader *)(prhdr + header->headerEntrySize);
+        prhdr = (ELFProgramHeader *)((uintptr_t)prhdr + header->headerEntrySize);
     }
 
     //printf("elf: entry point is at 0x%08X\n", header->entryPoint);
