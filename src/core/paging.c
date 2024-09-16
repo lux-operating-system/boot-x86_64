@@ -48,11 +48,12 @@ void pagingSetup() {
         pd[i] = 0;
     }
 
-    pml4[0] = (uint64_t)pdp | PAGE_PRESENT | PAGE_RW;
-    pml4[256] = (uint64_t)pdp | PAGE_PRESENT | PAGE_RW;
+    pml4[0] = (uintptr_t)pdp | PAGE_PRESENT | PAGE_RW;
+    pml4[256] = (uintptr_t)pdp | PAGE_PRESENT | PAGE_RW;
 
     for(int i = 0; i < 4; i++) {
-        pdp[i] = (uint64_t)pd + (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_RW;
+        pdp[i] = (uintptr_t)pd + (i * PAGE_SIZE);
+        pdp[i] |= PAGE_PRESENT | PAGE_RW;
     }
 
     uint64_t addr = 0;
