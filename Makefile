@@ -1,4 +1,4 @@
-CCFLAGS=-Wall -c -I./src/include -ffreestanding -O2 -m32 -mno-sse
+CCFLAGS=-Wall -c -I./src/include -ffreestanding -O2 -m32 -mno-sse --param=min-pagesize=0
 LDFLAGS=-T./src/lxboot.ld -nostdlib -m elf_i386
 CC=x86_64-lux-gcc
 LD=x86_64-lux-ld
