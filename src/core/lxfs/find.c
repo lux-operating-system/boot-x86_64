@@ -96,7 +96,6 @@ bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEn
 
     bool found = false;
     int pathIndex = 1;
-    int blockSizeBytes = getBlockSize(disk, partition) * getSectorSize(disk, partition);
 
     while(!found) {
         if(((entry->flags >> LXFS_DIR_TYPE_SHIFT) & LXFS_DIR_TYPE_MASK) != LXFS_DIR_TYPE_DIR) {
@@ -119,7 +118,7 @@ bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEn
             while(entry->flags & LXFS_DIR_VALID) {
                 //printf("lxfs: searching for %s, found %s\n", (char *)LXFS_TEXT_BUFFER, entry->name);
 
-                if(!strcmp((const char *)LXFS_TEXT_BUFFER, entry->name)) {
+                if(!strcmp((const char *)LXFS_TEXT_BUFFER, (const char *)entry->name)) {
                     found = true;
                     break;
                 }
