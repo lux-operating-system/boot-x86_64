@@ -84,8 +84,7 @@ int atoi(const char *s) {
     }
 
     if(!len) return 0;
-
-    char buffer[20];
+    if(len == 1) return (int) s[0] - '0';
 
     int multiplier = 1;
     for(int i = 1; i < len; i++) {
