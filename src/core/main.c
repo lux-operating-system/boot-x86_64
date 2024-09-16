@@ -74,7 +74,7 @@ int main(LXBootInfo *boot) {
         printf("loading ramdisk %s...\n", option->ramdisk);
 
         ramdisk = forcePageAlignment(lowestUsableAddress);
-        if(!lxfsRead(bootInfo.bootDevice, partitionIndex, option->ramdisk, (void *)ramdisk)) {
+        if(!lxfsRead(bootInfo.bootDevice, partitionIndex, option->ramdisk, (void *)(uintptr_t)ramdisk)) {
             printf("could not load %s\n", option->ramdisk);
             while(1);
         }
@@ -99,9 +99,9 @@ int main(LXBootInfo *boot) {
             
             moduleAddress = forcePageAlignment(lowestUsableAddress);
 
-            strcpy((char *)moduleAddress, module);
+            strcpy((char *)(uintptr_t)moduleAddress, module);
 
-            if(!lxfsRead(bootInfo.bootDevice, partitionIndex, module, (char *)moduleAddress + strlen((char *)moduleAddress) + 1)) {
+            if(!lxfsRead(bootInfo.bootDevice, partitionIndex, module, (char *)(uintptr_t)moduleAddress + strlen((char *)(uintptr_t)moduleAddress) + 1)) {
                 printf("could not load %s\n", module);
                 while(1);
             }
@@ -126,9 +126,9 @@ int main(LXBootInfo *boot) {
     memcpy(&kernelBootInfo.biosBootPartition, &bootInfo.partition, sizeof(MBRPartition));
     kernelBootInfo.kernelHighestAddress = kernelHighestAddress;
     kernelBootInfo.kernelTotalSize = kernelHighestAddress - 0x200000;
-    kernelBootInfo.acpiRSDP = (uint64_t)rsdp;
+    kernelBootInfo.acpiRSDP = (uintptr_t)rsdp;
     kernelBootInfo.highestPhysicalAddress = highestPhysicalAddress;
-    kernelBootInfo.memoryMap = (uint64_t)memoryMap;
+    kernelBootInfo.memoryMap = (uintptr_t)memoryMap;
     kernelBootInfo.memoryMapSize = memoryMapSize;
 
     kernelBootInfo.width = videoMode->width;
