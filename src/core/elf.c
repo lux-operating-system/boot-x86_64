@@ -60,7 +60,7 @@ uint64_t loadELF(const void *binary, uint64_t *highest) {
         if(prhdr->segmentType == ELF_SEGMENT_TYPE_NULL) {
             /* skip NULL  entries */
         } else if(prhdr->segmentType == ELF_SEGMENT_TYPE_LOAD) {
-            printf("load %d file/%d memory -> 0x%08X", (uint32_t)prhdr->fileSize, (uint32_t)prhdr->memorySize, (uint32_t)prhdr->virtualAddress);
+            printf("load %d file/%d memory -> 0x%08X\n", (uint32_t)prhdr->fileSize, (uint32_t)prhdr->memorySize, (uint32_t)prhdr->virtualAddress);
 
             // for now virtual=physical because we haven't yet enabled paging
             // for the same reason we're also ignoring the exec/read/write perms
