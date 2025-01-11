@@ -103,6 +103,8 @@ bool lxfsFindPath(uint8_t disk, int partition, const char *path, LXFSDirectoryEn
             return false;
         }
 
+        if(!(entry->flags & LXFS_DIR_VALID)) return false;
+
         uint64_t block = entry->block;
         int directoryIndex;
 
